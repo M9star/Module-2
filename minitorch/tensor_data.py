@@ -44,7 +44,11 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    idx = 0 
+    for i, s in zip(index, strides):
+        idx += i * s 
+    return idx 
+
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -61,7 +65,14 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    remaining = ordinal 
+    for i in range(len(out_index)):
+        out_index[i] = remaining % shape[i]
+        remaining = remaining // shape[i]
+
+
+
+    
 
 
 def broadcast_index(
@@ -84,7 +95,10 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    offset = len(big_shape) - len(shape)
+    for i in range(len(shape)):
+        out_index[i] = 0 if shape[i] == 1 else big_index[offset + i]
+
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -102,7 +116,19 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    a = list(shape1)
+    b = list(shape2)
+    if len(a) < len(b):
+        a = [1] * (len(b) - len(a)) + a
+    elif len(b) < len(a):
+        b = [1] * (len(a) - len(b)) + b
+
+    new_shape = []
+    for x, y in zip(a, b):
+        if x != 1 and y != 1 and x != y:
+            raise IndexingError(f"Broadcast failure {shape1} {shape2}")
+        new_shape.append(max(x, y))
+    return tuple(new_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
